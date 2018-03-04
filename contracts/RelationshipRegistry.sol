@@ -1,5 +1,3 @@
 /**
- * ID
- * Geo representation
- * key/value
+ * From Regis
  */
