@@ -1,5 +1,5 @@
 # Smart Contracts
-The following specification describes standard attributes and functions for storing the unique identity for a spatial unit on an Ethereum network. The spatial unit could represent any physical place: real estate property, land areas, borders, public property, etc. The content is based on the work done on OpenStreetMap as well as past ERC’s like identities (ERC 725) and claims (ERC 735).
+The following specification describes standard attributes and functions for storing the unique identity for a spatial unit on an Ethereum network. The spatial unit could represent any physical place: real estate property, land areas, borders, public property, air rights, etc. The content is based on the work done on OpenStreetMap as well as past ERC’s like identities (ERC 725) and claims (ERC 735).
 
 This spatial unit identity should reference a volumetric area on Earth, have a simply alias, and hash that uniquely defines it. Based on this skeleton identity, many different types of metadata, relationships, and rights could be assigned to it including ownership, occupancy, tenancy, etc. This universally unique identifier is meant to be a community-sourced standard used to connect the multitude of existing real estate and geospatial datasets.
 
