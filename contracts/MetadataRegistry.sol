@@ -6,7 +6,6 @@ contract MetadataRegistry
 	{
 		string multiaddr;
 		address owner;
-
 	}
 
     Link[] numLinks;
