@@ -8,7 +8,7 @@ contract MetadataRegistry
 		address owner;
 	}
 
-    Link[] numLinks;
+    	Link[] numLinks;
 
 	mapping(address => mapping(bytes32 => Link)) internal registry;
 	mapping(address => bytes32[]) internal subjectKeys;
