@@ -59,7 +59,7 @@ contract MetadataRegistry
 	function removeClaim(address _subject, bytes32 _key)
 	public
 	{
-		// asdf
+		// delete registry mapping and decreate numLinks by 1
 		require(registry[_subject][_key].owner != 0);
 		require(msg.sender == registry[_subject][_key].owner);
 		delete registry[_subject][_key];
