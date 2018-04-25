@@ -84,7 +84,7 @@ contract SpatialUnitRegistry
     function addSpatialUnit(string _alias, string _geoHash) 
     public
     {
-        address newSpatialUnit = new SpatialUnit(_alias, _geoHash);
+        SpatialUnit newSpatialUnit = new SpatialUnit(_alias, _geoHash);
         keys.push(newSpatialUnit);
         records[newSpatialUnit].alias = _alias;
         records[newSpatialUnit].geoHash = _geoHash;
@@ -93,6 +93,7 @@ contract SpatialUnitRegistry
         keys[keys.length - 1] = address(newSpatialUnit);
         numSpUnits++;
         emit SpatialUnitAdded(newSpatialUnit, _alias, _geoHash);
+	return address(newSpatialUnit);
     }
     
     function getSpatialUnit(address addr) 
