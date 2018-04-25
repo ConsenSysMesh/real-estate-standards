@@ -1,58 +1,92 @@
-pragma solidity 0.4.19;
+pragma solidity 0.4.23;
 
+contract MetadataRegistry
+{
+	struct Link
+	{
+		string multiaddr;
+		address owner;
+	}
 
-/// @title Ethereum Claims Registry - A repository storing claims issued
-///        from any Ethereum account to any other Ethereum account.
-contract MetadataRegistry {
+    Link[] numLinks;
 
-    mapping(address => mapping(address => mapping(bytes32 => bytes32))) public registry;
+	mapping(address => mapping(bytes32 => Link)) internal registry;
+	mapping(address => bytes32[]) internal subjectKeys;
+	mapping(address => mapping(bytes32 => uint)) internal subjectKeysIndex;
 
-    event ClaimSet(
-        address indexed issuer,
-        address indexed subject,
-        bytes32 indexed key,
-        bytes32 value,
-        uint updatedAt);
+	event LinkSet
+	(
+		address indexed issuer,
+		address indexed subject,
+		bytes32 indexed key,
+		Link value,
+		uint updatedAt
+	);
 
-    event ClaimRemoved(
-        address indexed issuer,
-        address indexed subject,
-        bytes32 indexed key,
-        uint removedAt);
+	event LinkRemoved
+	(
+		address indexed issuer,
+		address indexed subject,
+		bytes32 indexed key,
+		uint removedAt
+	);
 
-    /// @dev Create or update a claim
-    /// @param subject The address the claim is being issued to
-    /// @param key The key used to identify the claim
-    /// @param value The data associated with the claim
-    function setClaim(address subject, bytes32 key, bytes32 value) public {
-        registry[msg.sender][subject][key] = value;
-        ClaimSet(msg.sender, subject, key, value, now);
-    }
+	function setLink(address _subject, bytes32 _key, string _multiaddr)
+	public
+	{
+		require(registry[_subject][_key].owner == 0);
+		Link memory newLink = Link(_multiaddr, msg.sender);
+		registry[_subject][_key] = newLink;
+		numLinks.length++;
+		
+		uint olen = subjectKeys[_subject].length;
+		subjectKeys[_subject].length++;
+		subjectKeys[_subject][olen] = _key;
+		subjectKeysIndex[_subject][_key] = olen;
 
-    /// @dev Create or update a claim about yourself
-    /// @param key The key used to identify the claim
-    /// @param value The data associated with the claim
-    function setSelfClaim(bytes32 key, bytes32 value) public {
-        setClaim(msg.sender, key, value);
-    }
+		emit LinkSet(msg.sender, _subject, _key, newLink, now);		
+	}
 
-    /// @dev Allows to retrieve claims from other contracts as well as other off-chain interfaces
-    /// @param issuer The address of the issuer of the claim
-    /// @param subject The address to which the claim was issued to
-    /// @param key The key used to identify the claim
-    function getClaim(address issuer, address subject, bytes32 key) public constant returns(bytes32) {
-        return registry[issuer][subject][key];
-    }
+	function getLink(address _subject, bytes32 _key)
+	public
+	constant
+	returns (string multiaddr, address owner)
+	{
+		multiaddr = registry[_subject][_key].multiaddr;
+		owner = registry[_subject][_key].owner;
+	}
+	
+	function removeLink(address _subject, bytes32 _key)
+	public
+	{
+		require(registry[_subject][_key].owner != 0);
+		require(msg.sender == registry[_subject][_key].owner);
+		delete registry[_subject][_key];
+		numLinks.length--;
+		
+		uint keyIndex = subjectKeysIndex[_subject][_key];
+		
+		// eliminate gap left in array
+		for (uint i = keyIndex; i < subjectKeys[_subject].length-1; i++)
+		{
+			subjectKeys[_subject][i] = subjectKeys[_subject][i+1];
+		}
+		
+		// removal of line below saves 5000 gas
+		// delete subjectKeys[_subject][subjectKeys[_subject].length-1];
+		subjectKeys[_subject].length--;
 
-    /// @dev Allows to remove a claims from the registry.
-    ///      This can only be done by the issuer or the subject of the claim.
-    /// @param issuer The address of the issuer of the claim
-    /// @param subject The address to which the claim was issued to
-    /// @param key The key used to identify the claim
-    function removeClaim(address issuer, address subject, bytes32 key) public {
-        require(msg.sender == issuer || msg.sender == subject);
-        require(registry[issuer][subject][key] != 0);
-        delete registry[issuer][subject][key];
-        ClaimRemoved(msg.sender, subject, key, now);
-    }
+		delete subjectKeysIndex[_subject][_key];
+
+		emit LinkRemoved(msg.sender, _subject, _key, now);
+	}
+
+	// return number of links attributed to a particular SpatialUnit
+	function getNumLinks()
+	public 
+	constant 
+	returns (uint)
+	{
+		return numLinks.length;
+	}
 }
