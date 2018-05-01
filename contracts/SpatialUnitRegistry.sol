@@ -10,7 +10,7 @@ contract SpatialUnit
     
     mapping(address => uint) paymentpool;
     
-    function SpatialUnit(string _alias, string _geohash)
+    constructor (string _alias, string _geohash)
     public
     payable 
     {
@@ -75,15 +75,14 @@ contract SpatialUnitRegistry
         uint keysIndex;
     }
     
-    function SpatialUnitRegistry()
+    constructor ()
     public
     {
         owner = msg.sender;
     }
     
     function addSpatialUnit(string _alias, string _geoHash) 
-    public 
-    returns (address)
+    public
     {
         SpatialUnit newSpatialUnit = new SpatialUnit(_alias, _geoHash);
         keys.push(newSpatialUnit);
@@ -94,7 +93,6 @@ contract SpatialUnitRegistry
         keys[keys.length - 1] = address(newSpatialUnit);
         numSpUnits++;
         emit SpatialUnitAdded(newSpatialUnit, _alias, _geoHash);
-        return address(newSpatialUnit);
     }
     
     function getSpatialUnit(address addr) 
