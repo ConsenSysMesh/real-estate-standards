@@ -1,12 +1,12 @@
-pragma solidity ^0.4.20;
+pragma solidity 0.4.23;
 
 contract SpatialUnit
 {
     
-    address owner;
-    address receiver;
-    string alias;
-    string geohash;
+    address public owner;
+    address public receiver;
+    string public alias;
+    string public geohash;
     
     mapping(address => uint) paymentpool;
     
@@ -37,16 +37,14 @@ contract SpatialUnit
     function execPayment(address _receiver, uint _amount) 
     public 
     payable 
-    onlyOwner 
     {
-        // it is generally advisable to use pull OVER push for external calls (as per ConsenSys Security Best Practices repo)
+		require(msg.sender == owner);
+		// it is generally advisable to use pull OVER push for external calls (as per ConsenSys Security Best Practices repo)
         // _to = address to receive payment from SpatialUnit
         // _amount = amount of ether to send to ExecuteReceiver
         receiver = _receiver;
         require(_amount <= address(this).balance);
         paymentpool[receiver] += _amount;
-        
-        // address(_to).transfer(_amount);
     }
     
     function receivePayment() 
@@ -56,13 +54,6 @@ contract SpatialUnit
         paymentpool[msg.sender] = 0; 
         msg.sender.transfer(pmnt); 
     }
-    
-    modifier onlyOwner()
-    {
-        require(msg.sender == owner);
-        _;
-    }
-    
 }
 
 contract SpatialUnitRegistry
@@ -92,8 +83,9 @@ contract SpatialUnitRegistry
     
     function addSpatialUnit(string _alias, string _geoHash) 
     public 
+    returns (address)
     {
-        address newSpatialUnit = new SpatialUnit(_alias, _geoHash);
+        SpatialUnit newSpatialUnit = new SpatialUnit(_alias, _geoHash);
         keys.push(newSpatialUnit);
         records[newSpatialUnit].alias = _alias;
         records[newSpatialUnit].geoHash = _geoHash;
@@ -101,7 +93,8 @@ contract SpatialUnitRegistry
         records[newSpatialUnit].keysIndex = keys.length;
         keys[keys.length - 1] = address(newSpatialUnit);
         numSpUnits++;
-        emit SpatialUnitAdded(msg.sender, _alias, _geoHash);
+        emit SpatialUnitAdded(newSpatialUnit, _alias, _geoHash);
+        return address(newSpatialUnit);
     }
     
     function getSpatialUnit(address addr) 

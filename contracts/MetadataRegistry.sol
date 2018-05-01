@@ -1,4 +1,4 @@
-pragma solidity ^0.4.21;
+pragma solidity 0.4.23;
 
 contract MetadataRegistry
 {
@@ -8,7 +8,7 @@ contract MetadataRegistry
 		address owner;
 	}
 
-    	Link[] numLinks;
+    Link[] numLinks;
 
 	mapping(address => mapping(bytes32 => Link)) internal registry;
 	mapping(address => bytes32[]) internal subjectKeys;
@@ -56,10 +56,9 @@ contract MetadataRegistry
 		owner = registry[_subject][_key].owner;
 	}
 	
-	function removeClaim(address _subject, bytes32 _key)
+	function removeLink(address _subject, bytes32 _key)
 	public
 	{
-		// delete registry mapping and decreate numLinks by 1
 		require(registry[_subject][_key].owner != 0);
 		require(msg.sender == registry[_subject][_key].owner);
 		delete registry[_subject][_key];

@@ -1,14 +1,15 @@
-pragma solidity ^0.4.20;
+pragma solidity ^0.4.23;
 
 contract RightsRegistry {
 
-    struct Right {
+    struct Right 
+    {
     	address holderEntity;
     	address targetEntity;
     	string rightsType;
     	address rightsContract;
     	string infoUrl;
-    	unit status;
+    	uint status;
         uint startTime;
         uint expireTime;
     }
@@ -17,11 +18,14 @@ contract RightsRegistry {
     mapping(address => Right[]) indexedByHolderEntity;
     mapping(address => Right[]) indexedByRightsContract;
 
-    function addRight(address targetEntity, address holderEntity, string rightsType) {
-    	// Check that the rightsType for targetEntity isn't already taken
+    function addRight(address targetEntity, address holderEntity, string rightsType) 
+    public
+    {
+    	// Check that the rightsType for targetEntity isn't already taken 
 
         uint len = rights.length;
-        rights.length++;
+		rights.length++;
+		rights[len].targetEntity = targetEntity;
         rights[len].holderEntity = holderEntity;
         rights[len].rightsType   = rightsType;
 
@@ -30,20 +34,29 @@ contract RightsRegistry {
         indexedByHolderEntity[holderEntity][olen] = rights[len];
     }
 
-    function getNumRights() returns (uint) {
+    function getNumRights() 
+    public 
+    view 
+    returns (uint) 
+    {
         return rights.length;
     }
 
-    function getRightAt(uint rightIndex) returns (
+    function getRightAt(uint rightIndex) 
+    public 
+    view 
+    returns 
+	(
     	address holderEntity,
     	address targetEntity,
     	string rightsType,
     	address rightsContract,
     	string infoUrl,
-    	unit status,
+    	uint status,
         uint startTime,
-        uint expireTime,
-    ) {
+        uint expireTime
+	) 
+    {
         holderEntity = rights[rightIndex].holderEntity;
         targetEntity = rights[rightIndex].targetEntity;
         rightsType = rights[rightIndex].rightsType;
