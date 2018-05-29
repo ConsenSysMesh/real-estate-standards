@@ -1,4 +1,4 @@
-pragma solidity 0.4.23;
+pragma solidity ^0.4.22;
 
 contract SpatialUnit
 {
@@ -7,8 +7,10 @@ contract SpatialUnit
     address public receiver;
     string public alias;
     string public geohash;
+    address[] public ownerhistory;
     
     mapping(address => uint) paymentpool;
+	mapping(bytes32 => bytes32) keyvaluestore;
     
     function SpatialUnit(string _alias, string _geohash)
     public
@@ -28,20 +30,34 @@ contract SpatialUnit
     
     function getBalance() 
     public 
-    view
+    view 
     returns (uint)
     {
         return address(this).balance;
     }
+
+	function store(bytes32 _key, bytes32 _value)
+	public
+	returns (bytes32 _stored_val)
+	{
+		require(msg.sender == owner);
+		keyvaluestore[_key] = _value;
+		return _value;
+	}
+
+	function retrieve(bytes32 _key)
+	public
+	view 
+	returns (bytes32 _stored_val)
+	{
+		return keyvaluestore[_key];
+	}
     
     function execPayment(address _receiver, uint _amount) 
     public 
     payable 
     {
 		require(msg.sender == owner);
-		// it is generally advisable to use pull OVER push for external calls (as per ConsenSys Security Best Practices repo)
-        // _to = address to receive payment from SpatialUnit
-        // _amount = amount of ether to send to ExecuteReceiver
         receiver = _receiver;
         require(_amount <= address(this).balance);
         paymentpool[receiver] += _amount;
@@ -64,7 +80,7 @@ contract SpatialUnitRegistry
     address[] public keys;
     
     // events
-    event SpatialUnitAdded(address owner, string _alias, string _geoHash);
+    event SpatialUnitAdded(address indexed owner, string indexed _alias, string indexed _geoHash);
     
     // structs    
     struct Unit 
@@ -83,6 +99,7 @@ contract SpatialUnitRegistry
     
     function addSpatialUnit(string _alias, string _geoHash) 
     public
+	returns (address _newSpatialunit, uint _keyslength)
     {
         SpatialUnit newSpatialUnit = new SpatialUnit(_alias, _geoHash);
         keys.push(newSpatialUnit);
@@ -93,7 +110,7 @@ contract SpatialUnitRegistry
         keys[keys.length - 1] = address(newSpatialUnit);
         numSpUnits++;
         emit SpatialUnitAdded(newSpatialUnit, _alias, _geoHash);
-	return address(newSpatialUnit);
+		return(address(newSpatialUnit), keys.length);
     }
     
     function getSpatialUnit(address addr) 
