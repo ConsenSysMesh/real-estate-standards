@@ -1,6 +1,6 @@
 pragma solidity ^0.4.22;
 
-contract SpatialUnit
+contract SpatialUnit  
 {
     
     address public owner;
@@ -8,6 +8,7 @@ contract SpatialUnit
     string public alias;
     string public geohash;
     address[] public ownerhistory;
+	uint public ownertransfercount;
     
     mapping(address => uint) paymentpool;
 	mapping(bytes32 => bytes32) keyvaluestore;
@@ -17,6 +18,7 @@ contract SpatialUnit
     payable 
     {
         owner = msg.sender;
+		ownerhistory.push(owner);
         alias = _alias;
         geohash = _geohash;
     }
@@ -53,6 +55,17 @@ contract SpatialUnit
 		return keyvaluestore[_key];
 	}
     
+	function changeOwner(address _newOwner)
+	public 
+	returns (address)
+	{
+		require(msg.sender == owner);
+		owner = _newOwner;
+		ownerhistory.push(owner);
+		ownertransfercount++;
+		return(address(owner));
+	}
+
     function execPayment(address _receiver, uint _amount) 
     public 
     payable 
@@ -102,6 +115,7 @@ contract SpatialUnitRegistry
 	returns (address _newSpatialunit, uint _keyslength)
     {
         SpatialUnit newSpatialUnit = new SpatialUnit(_alias, _geoHash);
+        newSpatialUnit.changeOwner(msg.sender);
         keys.push(newSpatialUnit);
         records[newSpatialUnit].alias = _alias;
         records[newSpatialUnit].geoHash = _geoHash;

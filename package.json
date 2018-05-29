@@ -2,14 +2,14 @@
   "name": "tara",
   "version": "1.0.0",
   "dependencies": {
-  	"bignumber.js": "git+https://github.com/frozeman/bignumber.js-nolookahead.git#57692b3ecfc98bbdd6b3a516cb2353652ea49934",
-	"crypto-js": "^3.1.8",
-	"utf8": "^2.1.2",
-	"web3": "^0.20.4",
-	"xhr2": "^0.1.4",
-	"xmlhttprequest": "^1.8.0"
+    "bignumber.js": "git+https://github.com/frozeman/bignumber.js-nolookahead.git#57692b3ecfc98bbdd6b3a516cb2353652ea49934",
+    "crypto-js": "^3.1.8",
+    "utf8": "^2.1.2",
+    "web3": "^0.20.4",
+    "xhr2": "^0.1.4",
+    "xmlhttprequest": "^1.8.0"
   },
-  "description": "",
+  "description": "The following specification describes standard attributes and functions for storing the unique identity for a spatial unit on an Ethereum network. The spatial unit could represent any physical place: real estate property, land areas, borders, public property, air rights, etc. The content is based on the work done on OpenStreetMap as well as past ERC’s like identities (ERC 725) and claims (ERC 735).",
   "main": "truffle.js",
   "directories": {
     "test": "test"
@@ -18,5 +18,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ConsenSys/real-estate-standards.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/ConsenSys/real-estate-standards/issues"
+  },
+  "homepage": "https://github.com/ConsenSys/real-estate-standards#readme"
 }
