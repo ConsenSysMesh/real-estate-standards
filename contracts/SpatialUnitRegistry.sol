@@ -4,6 +4,7 @@ contract SpatialUnit
 {
     
     address public owner;
+	address public registry_address;
     address public receiver;
     string public alias;
     string public geohash;
@@ -13,12 +14,13 @@ contract SpatialUnit
     mapping(address => uint) paymentpool;
 	mapping(bytes32 => bytes32) keyvaluestore;
     
-    function SpatialUnit(string _alias, string _geohash)
+    function SpatialUnit(address _owner, string _alias, string _geohash)
     public
     payable 
     {
-        owner = msg.sender;
+        owner = _owner;
 		ownerhistory.push(owner);
+		registry_address = msg.sender;
         alias = _alias;
         geohash = _geohash;
     }
@@ -35,16 +37,14 @@ contract SpatialUnit
     view 
     returns (uint)
     {
-        return address(this).balance;
+        return (address(this).balance);
     }
 
 	function store(bytes32 _key, bytes32 _value)
 	public
-	returns (bytes32 _stored_val)
 	{
 		require(msg.sender == owner);
 		keyvaluestore[_key] = _value;
-		return _value;
 	}
 
 	function retrieve(bytes32 _key)
@@ -52,7 +52,7 @@ contract SpatialUnit
 	view 
 	returns (bytes32 _stored_val)
 	{
-		return keyvaluestore[_key];
+		return (keyvaluestore[_key]);
 	}
     
 	function changeOwner(address _newOwner)
@@ -63,7 +63,7 @@ contract SpatialUnit
 		owner = _newOwner;
 		ownerhistory.push(owner);
 		ownertransfercount++;
-		return(address(owner));
+		return (address(owner));
 	}
 
     function execPayment(address _receiver, uint _amount) 
@@ -88,6 +88,7 @@ contract SpatialUnit
 contract SpatialUnitRegistry
 {
     address public owner;
+	// adding creator in addition to owner because ownership of a Spatial Unit can be transferred later
     uint public numSpUnits;
     mapping(address => Unit) records;
     address[] public keys;
@@ -98,7 +99,7 @@ contract SpatialUnitRegistry
     // structs    
     struct Unit 
     {
-        address owner;
+        address creator;
         string alias;
         string geoHash; 
         uint keysIndex;
@@ -114,27 +115,27 @@ contract SpatialUnitRegistry
     public
 	returns (address _newSpatialunit, uint _keyslength)
     {
-        SpatialUnit newSpatialUnit = new SpatialUnit(_alias, _geoHash);
-        newSpatialUnit.changeOwner(msg.sender);
+        SpatialUnit newSpatialUnit = new SpatialUnit(msg.sender, _alias, _geoHash);
+        // newSpatialUnit.changeOwner(msg.sender);
         keys.push(newSpatialUnit);
         records[newSpatialUnit].alias = _alias;
         records[newSpatialUnit].geoHash = _geoHash;
-        records[newSpatialUnit].owner = msg.sender;
+        records[newSpatialUnit].creator = msg.sender;
         records[newSpatialUnit].keysIndex = keys.length;
-        keys[keys.length - 1] = address(newSpatialUnit);
         numSpUnits++;
         emit SpatialUnitAdded(newSpatialUnit, _alias, _geoHash);
-		return(address(newSpatialUnit), keys.length);
+		return (address(newSpatialUnit), keys.length);
     }
     
     function getSpatialUnit(address addr) 
     public
     view
-    returns (address theowner, string alias, string geoHash) 
+    returns (address creator, string alias, string geoHash) 
     {
-        theowner = records[addr].owner;
+        creator = records[addr].creator;
         alias = records[addr].alias;
         geoHash = records[addr].geoHash;
+		return (creator, alias, geoHash);
     }
     
 } 
